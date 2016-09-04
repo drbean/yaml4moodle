@@ -2,16 +2,13 @@
 
 yaml2tags - "Convert drbean's YAML jigsaw quiz questions to Moodle GIFT format" 
 
-# VERSION
-
-Version 0.01
-
 # SYNOPSIS
 
-yaml2tags encode -c news -t people -s kiss -f 0 > gift\_set.txt
-# =head1 DESCRIPTION
+	yaml2tags encode -c news -t people -s kiss -f 0 > gift\_set.txt
 
-	Encoding YAML quiz section:
+# DESCRIPTION
+
+Encoding YAML quiz section:
 
 	kiss:
 	  jigsaw:
