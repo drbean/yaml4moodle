@@ -53,18 +53,18 @@ becomes:
 	:: Question 1 :: A {
 	~ Erykah
 	~ Mario
-	&#x3d; Shia
+	= Shia
 	}
 
 	:: Question 2 :: B {
-	&#x3d; Erykah
+	= Erykah
 	~ Mario
 	~ Shia
 	}
 
 	:: Question 3 :: C {
 	~ Erykah
-	&#x3d; Mario
+	= Mario
 	~ Shia
 	}
 
