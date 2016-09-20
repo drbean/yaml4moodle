@@ -33,17 +33,17 @@ sub execute {
 
 	my $gift = "// Auto generated for the '$opt->{c}' course, '$opt->{t}' topic, '$opt->{s}' story, '$opt->{f}' form\n";
 	$gift .= "// identifier: $story->{identifier}\n";
-	$gift .= "::Jigsaw cards::\n";
-	$gift .= "A: $story->{A}\n";
-	$gift .= "B: $story->{B}\n";
-	$gift .= "C: $story->{C}\n";
+	# $gift .= "::Jigsaw cards::\n";
+	# $gift .= "A: $story->{A}\n";
+	# $gift .= "B: $story->{B}\n";
+	# $gift .= "C: $story->{C}\n";
 	$gift .= "\n";
 	my $n = 0;
 	for my $item ( @$quiz ) {
 		$n++;
 		my $question = $item->{question};
 		my $answer = $item->{answer};
-		$gift .= ":: Question $n :: $question {\n";
+		$gift .= ":: $opt->{t} $opt->{s} $opt->{f} Question $n :: $question {\n";
 		if ( defined $item->{option} ) {
 			my $option = $item->{option};
 				for my $alternative ( @$option ) {
