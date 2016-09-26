@@ -26,7 +26,7 @@ sub opt_spec  {
 sub execute {
 	my ($self, $opt, $args) = @_;
 
-	my $yaml = LoadFile "/home/drbean/class/$opt->{c}/$opt->{t}/cards.yaml";
+	my $yaml = LoadFile "/home/drbean/curriculum/$opt->{c}/$opt->{t}/cards.yaml";
 
 	my $story = $yaml->{$opt->{s}}->{jigsaw}->{$opt->{f}};
 	my $quiz = $story->{quiz};
