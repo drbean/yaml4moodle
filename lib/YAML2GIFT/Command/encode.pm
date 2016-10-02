@@ -45,7 +45,7 @@ sub execute {
 		$n++;
 		my $question = $item->{question};
 		my $answer = $item->{answer};
-		$gift .= ":: $opt->{t} $opt->{s} $opt->{f} Question $n :: $question {\n";
+		$gift .= ":: $opt->{s} $opt->{f} Qn $n :: $question {\n";
 		if ( defined $item->{option} ) {
 			my $option = $item->{option};
 				for my $alternative ( @$option ) {
