@@ -26,13 +26,15 @@ sub opt_spec  {
 sub execute {
 	my ($self, $opt, $args) = @_;
 
+	my ($course, $topic, $story, $form) = @$opt{qw/c t s f/};
+
 	my $yaml = LoadFile "/home/drbean/curriculum/$opt->{c}/$opt->{t}/cards.yaml";
 
-	my $story = $yaml->{$opt->{s}}->{jigsaw}->{$opt->{f}};
-	my $quiz = $story->{quiz};
+	my $content = $yaml->{$opt->{s}}->{jigsaw}->{$opt->{f}};
+	my $quiz = $content->{quiz};
 
 	my $gift = "// Auto generated for the '$opt->{c}' course, '$opt->{t}' topic, '$opt->{s}' story, '$opt->{f}' form\n";
-	$gift .= "// identifier: $story->{identifier}\n";
+	$gift .= "// identifier: $content->{identifier}\n";
 	# $gift .= "::Jigsaw cards::\n";
 	# $gift .= "A: $story->{A}\n";
 	# $gift .= "B: $story->{B}\n";
@@ -57,7 +59,7 @@ sub execute {
 		$gift .= "}\n\n";
 	}
 
-	io('-')->print( $gift );
+	io("${topic}/quiz_${topic}_${story}_${form}.gift")->print( $gift );
 }
 
 1;
