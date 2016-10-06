@@ -48,10 +48,6 @@ sub execute {
 			my $quiz = $content->{$form}->{quiz};
 
 			$gift .= "// identifier: $content->{$form}->{identifier}\n";
-			# $gift .= "::Jigsaw cards::\n";
-			# $gift .= "A: $story->{A}\n";
-			# $gift .= "B: $story->{B}\n";
-			# $gift .= "C: $story->{C}\n";
 			$gift .= "\n";
 			my $n = 0;
 			for my $item ( @$quiz ) {
