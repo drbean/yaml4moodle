@@ -30,35 +30,49 @@ sub execute {
 
 	my $yaml = LoadFile "/home/drbean/curriculum/$opt->{c}/$opt->{t}/cards.yaml";
 
-	my $content = $yaml->{$opt->{s}}->{jigsaw}->{$opt->{f}};
-	my $quiz = $content->{quiz};
+	my @story;
+	if ( $story eq 'all' ) {
+		delete $yaml->{genre};
+		@story = keys %$yaml;
+	}
+	else { @story = $story; }
+	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$form' form\n";
+	for my $story ( @story ) {
+		my $content = $yaml->{$story}->{jigsaw};
+		my @form;
+		if ( $form eq 'all' ) {
+			@form = keys %$content;
+		}
+		else { @form = $form }
+		for my $form ( @form ) {
+			my $quiz = $content->{$form}->{quiz};
 
-	my $gift = "// Auto generated for the '$opt->{c}' course, '$opt->{t}' topic, '$opt->{s}' story, '$opt->{f}' form\n";
-	$gift .= "// identifier: $content->{identifier}\n";
-	# $gift .= "::Jigsaw cards::\n";
-	# $gift .= "A: $story->{A}\n";
-	# $gift .= "B: $story->{B}\n";
-	# $gift .= "C: $story->{C}\n";
-	$gift .= "\n";
-	my $n = 0;
-	for my $item ( @$quiz ) {
-		$n++;
-		my $question = $item->{question};
-		my $answer = $item->{answer};
-		$gift .= ":: $opt->{s} $opt->{f} Qn $n :: $question {\n";
-		if ( defined $item->{option} ) {
-			my $option = $item->{option};
-				for my $alternative ( @$option ) {
-				if ( $answer eq $alternative ) {
-					$gift .= "= $alternative\n";
+			$gift .= "// identifier: $content->{$form}->{identifier}\n";
+			# $gift .= "::Jigsaw cards::\n";
+			# $gift .= "A: $story->{A}\n";
+			# $gift .= "B: $story->{B}\n";
+			# $gift .= "C: $story->{C}\n";
+			$gift .= "\n";
+			my $n = 0;
+			for my $item ( @$quiz ) {
+				$n++;
+				my $question = $item->{question};
+				my $answer = $item->{answer};
+				$gift .= ":: $story $form  Qn $n :: $question {\n";
+				if ( defined $item->{option} ) {
+					my $option = $item->{option};
+					for my $alternative ( @$option ) {
+						if ( $answer eq $alternative ) {
+							$gift .= "= $alternative\n";
+						}
+						else { $gift .= "~ $alternative\n" }
+					}
 				}
-				else { $gift .= "~ $alternative\n" }
+				else { $gift .= uc $answer . "\n"}
+				$gift .= "}\n\n";
 			}
 		}
-		else { $gift .= uc $answer . "\n"}
-		$gift .= "}\n\n";
 	}
-
 	io("${topic}/quiz_${topic}_${story}_${form}.gift")->print( $gift );
 }
 
