@@ -49,9 +49,9 @@ sub execute {
 
 			$gift .= "// identifier: $content->{$form}->{identifier}\n";
 			$gift .= "\n";
-			my $n = 0;
+			my $n = "00";
 			for my $item ( @$quiz ) {
-				$n++;
+				++$n;
 				my $question = $item->{question};
 				my $answer = $item->{answer};
 				$gift .= ":: $story $form  Qn $n :: $question {\n";
@@ -69,7 +69,7 @@ sub execute {
 			}
 		}
 	}
-	io("${topic}/quiz_${topic}_${story}_${form}.gift")->print( $gift );
+	io("-")->print( $gift );
 }
 
 1;
