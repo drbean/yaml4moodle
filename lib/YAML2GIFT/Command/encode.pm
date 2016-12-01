@@ -72,8 +72,8 @@ sub execute {
 				}
 			}
 		}
-		elsif ( $yaml->{$story}->{match} ) {
-			my $content = $yaml->{$story}->{match};
+		elsif ( $yaml->{$story}->{scramble} ) {
+			my $content = $yaml->{$story}->{scramble};
 			if ( $form eq 'all' ) {
 				@form = keys %$content;
 			}
