@@ -36,40 +36,69 @@ sub execute {
 		@story = keys %$yaml;
 	}
 	else { @story = $story; }
-	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$form' form\n";
+	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$form' form\n\n";
+	$gift .= '// $CATEGORY: $cat1$' . "/Default for $course\n\n";
 	for my $story ( @story ) {
-		my $content = $yaml->{$story}->{jigsaw};
 		my @form;
-		if ( $form eq 'all' ) {
-			@form = keys %$content;
-		}
-		else { @form = $form }
-		for my $form ( @form ) {
-			my $quiz = $content->{$form}->{quiz};
+		if ( $yaml->{$story}->{jigsaw} ) {
+			my $content = $yaml->{$story}->{jigsaw};
+			if ( $form eq 'all' ) {
+				@form = keys %$content;
+			}
+			else { @form = $form }
+			for my $form ( @form ) {
+				my $quiz = $content->{$form}->{quiz};
 
-			$gift .= "// identifier: $content->{$form}->{identifier}\n";
-			$gift .= "\n";
-			my $n = "00";
-			for my $item ( @$quiz ) {
-				++$n;
-				my $question = $item->{question};
-				my $answer = $item->{answer};
-				$gift .= ":: $story $form  Qn $n :: $question {\n";
-				if ( defined $item->{option} ) {
-					my $option = $item->{option};
-					for my $alternative ( @$option ) {
-						if ( $answer eq $alternative ) {
-							$gift .= "= $alternative\n";
+				$gift .= "// identifier: $content->{$form}->{identifier}\n";
+				$gift .= "\n";
+				my $n = "00";
+				for my $item ( @$quiz ) {
+					++$n;
+					my $question = $item->{question};
+					my $answer = $item->{answer};
+					my $prefix = substr $question, 0, 15;
+					$gift .= ":: $story $form  Qn $n: $prefix :: $question {\n";
+					if ( defined $item->{option} ) {
+						my $option = $item->{option};
+						for my $alternative ( @$option ) {
+							if ( $answer eq $alternative ) {
+								$gift .= "= $alternative\n";
+							}
+							else { $gift .= "~ $alternative\n" }
 						}
-						else { $gift .= "~ $alternative\n" }
 					}
+					else { $gift .= uc $answer . "\n"}
+					$gift .= "}\n\n";
 				}
-				else { $gift .= uc $answer . "\n"}
-				$gift .= "}\n\n";
+			}
+		}
+		elsif ( $yaml->{$story}->{match} ) {
+			my $content = $yaml->{$story}->{match};
+			if ( $form eq 'all' ) {
+				@form = keys %$content;
+			}
+			else { @form = $form }
+			for my $form ( @form ) {
+				my $sentences = $content->{$form}->{sentence};
+				$gift .= "// identifier: $content->{$form}->{identifier}\n";
+				$gift .= "\n";
+				my $n = "00";
+				for my $sentence ( @$sentences ) {
+					++$n;
+					$gift .= ":: $story $form  Qn $n :: Put the following words in order. {\n";
+					my @word = split '\s', $sentence;
+					my $m = "00";
+					for my $word ( @word ) {
+						++$m;
+						$gift .= "\t=$m -> $word\n"
+					}
+					$gift .= "}\n\n";
+				}
 			}
 		}
 	}
-	io("-")->print( $gift );
+	$gift > io("-");
+
 }
 
 1;
