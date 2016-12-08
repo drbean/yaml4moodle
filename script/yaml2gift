@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 # Created: 
-# Last Edit: 2016 Sep 04, 08:48:38 PM
+# Last Edit: 2016 Dec 05, 11:51:54 AM
 # $Id$
 
 =head1 NAME
@@ -21,7 +21,7 @@ use warnings;
 
 =head1 SYNOPSIS
 
-yaml2tags encode -c news -t people -s kiss -f 0 > gift_set.txt
+yaml2tags encode -c news -t people -s kiss -q jigsaw -f 0 > gift_set.txt
 =cut
 
 #!/usr/bin/perl
