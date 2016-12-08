@@ -11,13 +11,14 @@ use IO::All;
 sub abstract { "Convert drbean's YAML quiz questions to Moodle GIFT format" }
 sub description { "Convert drbean's YAML quiz questions to Moodle GIFT format" }
 
-sub usage_desc { "yaml2gift encode -c news -t people -s kiss -f 0" }
+sub usage_desc { "yaml2gift encode -c news -t people -s kiss -q jigsaw -f 0" }
 
 sub opt_spec  {
         return (
                 ["c=s", "course"]
                 , ["t=s", "topic"]
                 , ["s=s", "story"]
+                , ["q=s", "quiz"]
                 , ["f=s", "form"]
 	);
 }
@@ -26,7 +27,7 @@ sub opt_spec  {
 sub execute {
 	my ($self, $opt, $args) = @_;
 
-	my ($course, $topic, $story, $form) = @$opt{qw/c t s f/};
+	my ($course, $topic, $story, $quiz, $form) = @$opt{qw/c t s q f/};
 
 	my $yaml = LoadFile "/home/drbean/curriculum/$opt->{c}/$opt->{t}/cards.yaml";
 
@@ -36,12 +37,20 @@ sub execute {
 		@story = keys %$yaml;
 	}
 	else { @story = $story; }
-	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$form' form\n\n";
-	$gift .= '// $CATEGORY: $cat1$' . "/Default for $course\n\n";
+	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$quiz' quiz, '$form' form\n\n";
+	my $Course = ucfirst $course;
+	# $gift .= '$CATEGORY: $cat1$' . "/Default for $course/$topic\n\n";
+	$gift .= '$CATEGORY: ' . "/Top/Default for $course/$topic\n\n";
+
+	unless ( $quiz ) {
+		my $story_content = $yaml->{$story};
+		my @story_keys = keys %$story_content;
+		$quiz = shift @story_keys;
+	}
 	for my $story ( @story ) {
 		my @form;
-		if ( $yaml->{$story}->{jigsaw} ) {
-			my $content = $yaml->{$story}->{jigsaw};
+		my $content = $yaml->{$story}->{$quiz};
+		if ( $quiz eq "jigsaw" ) {
 			if ( $form eq 'all' ) {
 				@form = keys %$content;
 			}
@@ -72,8 +81,7 @@ sub execute {
 				}
 			}
 		}
-		elsif ( $yaml->{$story}->{scramble} ) {
-			my $content = $yaml->{$story}->{scramble};
+		elsif ( $quiz eq "scramble" ) {
 			if ( $form eq 'all' ) {
 				@form = keys %$content;
 			}
