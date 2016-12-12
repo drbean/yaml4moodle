@@ -39,8 +39,6 @@ sub execute {
 	else { @story = $story; }
 	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$quiz' quiz, '$form' form\n\n";
 	my $Course = ucfirst $course;
-	# $gift .= '$CATEGORY: $cat1$' . "/Default for $course/$topic\n\n";
-	$gift .= '$CATEGORY: ' . "/Top/Default for $course/$topic\n\n";
 
 	unless ( $quiz ) {
 		my $story_content = $yaml->{$story};
