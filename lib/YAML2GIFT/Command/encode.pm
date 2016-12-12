@@ -48,11 +48,11 @@ sub execute {
 	for my $story ( @story ) {
 		my @form;
 		my $content = $yaml->{$story}->{$quiz};
+		if ( $form eq 'all' ) {
+			@form = keys %$content;
+		}
+		else { @form = $form }
 		if ( $quiz eq "jigsaw" ) {
-			if ( $form eq 'all' ) {
-				@form = keys %$content;
-			}
-			else { @form = $form }
 			for my $form ( @form ) {
 				my $quiz = $content->{$form}->{quiz};
 
@@ -80,10 +80,6 @@ sub execute {
 			}
 		}
 		elsif ( $quiz eq "scramble" ) {
-			if ( $form eq 'all' ) {
-				@form = keys %$content;
-			}
-			else { @form = $form }
 			for my $form ( @form ) {
 				my $sentences = $content->{$form}->{sentence};
 				$gift .= "// identifier: $content->{$form}->{identifier}\n";
