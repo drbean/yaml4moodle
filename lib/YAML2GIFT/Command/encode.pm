@@ -79,6 +79,23 @@ sub execute {
 				}
 			}
 		}
+		elsif ( $quiz eq "match" ) {
+			for my $form ( @form ) {
+				my $identifier = $content->{$form}->{identifier};
+				$gift .= "// identifier: $identifier\n";
+				$gift .= "\n";
+				my $n = "00";
+				$gift .= ":: $story $form  Qn $n: $identifier :: Match the following words with their contexts. {\n";
+				my $pairs = $content->{$form}->{pair};
+				for my $pair ( @$pairs ) {
+					++$n;
+					my $prompt = $pair->[0];
+					my $answer = $pair->[1];
+					$gift .= "\t=$prompt -> $answer\n";
+				}
+				$gift .= "}\n\n";
+			}
+		}
 		elsif ( $quiz eq "scramble" ) {
 			for my $form ( @form ) {
 				my $sentences = $content->{$form}->{sentence};
