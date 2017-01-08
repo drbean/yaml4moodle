@@ -1,15 +1,15 @@
-package YAML2GIFT::Command::encode;
+package YAML4Moodle::Command::encode;
 
 use lib "lib";
 
-use YAML2GIFT -command;
+use YAML4Moodle -command;
 use strict;
 use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
 use IO::All;
 
-sub abstract { "Convert drbean's YAML quiz questions to Moodle GIFT format" }
-sub description { "Convert drbean's YAML quiz questions to Moodle GIFT format" }
+sub abstract { "Convert drbean's YAML quiz questions to Moodle formats" }
+sub description { "Convert drbean's YAML quiz questions to Moodle formats" }
 
 sub usage_desc { "yaml2gift encode -c news -t people -s kiss -q jigsaw -f 0" }
 
@@ -100,6 +100,27 @@ sub execute {
 		elsif ( $quiz eq "scramble" ) {
 			for my $form ( @form ) {
 				my $sentences = $content->{$form}->{sentence};
+				$gift .= "// identifier: $content->{$form}->{identifier}\n";
+				$gift .= "\n";
+				my $n = "00";
+				for my $sentence ( @$sentences ) {
+					++$n;
+					my $prefix = substr $sentence, 0, 15;
+					$gift .= ":: $story $form  Qn $n: $prefix :: Put the following words in order. {\n";
+					my @word = split '\s', $sentence;
+					my $m = "00";
+					for my $word ( @word ) {
+						++$m;
+						$gift .= "\t=$m -> $word\n"
+					}
+					$gift .= "}\n\n";
+				}
+			}
+		}
+		elsif ( $quiz eq "drag" ) {
+			for my $form ( @form ) {
+				my $sentences = $content->{$form}->{sentence};
+				my $cloze = $content->{$form}->{cloze};
 				$gift .= "// identifier: $content->{$form}->{identifier}\n";
 				$gift .= "\n";
 				my $n = "00";

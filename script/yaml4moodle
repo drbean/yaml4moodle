@@ -1,12 +1,12 @@
 #!/usr/bin/perl 
 
 # Created: 
-# Last Edit: 2016 Dec 05, 11:51:54 AM
+# Last Edit: 2017 Jan 08, 02:53:09 PM
 # $Id$
 
 =head1 NAME
 
-yaml2tags - "Convert drbean's YAML jigsaw quiz questions to Moodle GIFT format" 
+yaml4moodle - "Convert drbean's YAML jigsaw quiz questions to Moodle formats" 
 
 =head1 VERSION
 
@@ -14,14 +14,15 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
 
 =head1 SYNOPSIS
 
-yaml2tags encode -c news -t people -s kiss -q jigsaw -f 0 > gift_set.txt
+yaml4moodle encode -c news -t people -s kiss -q jigsaw -f 0 > gift_set.txt
+
 =cut
 
 #!/usr/bin/perl
@@ -30,11 +31,11 @@ use FindBin qw/$Bin/;
 
 use lib "$Bin/../lib";
 
-use YAML2GIFT;
+use YAML4Moodle;
 
 =head1 DESCRIPTION
 
-Encodinge YAML quiz section:
+Encoding YAML quiz section:
 
 kiss:
   jigsaw:
@@ -105,7 +106,7 @@ FALSE
 
 =cut
 
-YAML2GIFT->run;
+YAML4Moodle->run;
 
 =head1 AUTHOR
 
@@ -120,7 +121,7 @@ under the same terms as Perl itself.
 
 =cut
 
-# End of yaml2gift
+# End of yaml4moodle
 
 # vim: set ts=8 sts=4 sw=4 noet:
 
