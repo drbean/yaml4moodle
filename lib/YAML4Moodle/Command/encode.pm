@@ -120,22 +120,30 @@ sub execute {
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
 				my $sentences = $content->{$form}->{sentence};
-				my $cloze = $content->{$form}->{cloze};
+				my $cloze = $content->{$form}->{clozed};
+				my @word = split /(\s+|\.|,)/, $sentences;
+				my @string = split /\|/, $cloze;
 				$gift .= "// identifier: $content->{$form}->{identifier}\n";
 				$gift .= "\n";
-				my $n = "00";
-				for my $sentence ( @$sentences ) {
-					++$n;
-					my $prefix = substr $sentence, 0, 15;
-					$gift .= ":: $story $form  Qn $n: $prefix :: Put the following words in order. {\n";
-					my @word = split '\s', $sentence;
-					my $m = "00";
-					for my $word ( @word ) {
-						++$m;
-						$gift .= "\t=$m -> $word\n"
+				my @question;
+				my @answer;
+				my $n = "0";
+				my $match;
+				$match = shift @string;
+				for my $word ( @word ) {
+					if ( $match eq $word ) {
+						$n++;
+						push @question, "[[$n]]";
+						$match = shift @string;
+						push @answer, $word;
 					}
-					$gift .= "}\n\n";
+					else {
+						push @question, $word;
+					} 
 				}
+				my $question = join "", @question;
+				my $answer = join "\t", @answer;
+				$gift .= $question . "\n\n" . $answer;
 			}
 		}
 	}
