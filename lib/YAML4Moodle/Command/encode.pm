@@ -86,8 +86,8 @@ sub execute {
 				$gift .= "\n";
 				my $n = "00";
 				my $pairs = $content->{$form}->{pair};
-				my $prefix = substr $pairs->[0]->[0], 0, 15;
-				$gift .= ":: $story $quiz $form  Qn $n: $prefix :: Match the following words with their contexts. {\n";
+				my $prefix = substr $pairs->[0]->[1], 0, 15;
+				$gift .= ":: $story $quiz $form  Qn $n: $prefix :: Match. {\n";
 				for my $pair ( @$pairs ) {
 					++$n;
 					my $prompt = $pair->[0];
@@ -106,7 +106,7 @@ sub execute {
 				for my $sentence ( @$sentences ) {
 					++$n;
 					my $prefix = substr $sentence, 0, 15;
-					$gift .= ":: $story $form  Qn $n: $prefix :: Put the following words in order. {\n";
+					$gift .= ":: $story $form  Qn $n: $prefix :: Unscramble. {\n";
 					my @word = split '\s', $sentence;
 					my $m = "00";
 					for my $word ( @word ) {
