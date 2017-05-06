@@ -1,4 +1,4 @@
-package YAML4Moodle::Command::encode;
+package YAML4Moodle::Command::gift;
 
 use lib "lib";
 
@@ -8,10 +8,10 @@ use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
 use IO::All;
 
-sub abstract { "Convert drbean's YAML quiz questions to Moodle formats" }
-sub description { "Convert drbean's YAML quiz questions to Moodle formats" }
+sub abstract { "Convert drbean's YAML quiz questions to Moodle gift format" }
+sub description { "Convert drbean's YAML quiz questions to Moodle gift format" }
 
-sub usage_desc { "yaml2gift encode -c news -t people -s kiss -q jigsaw -f 0" }
+sub usage_desc { "yaml2gift gift -c news -t people -s kiss -q jigsaw -f 0" }
 
 sub opt_spec  {
         return (

@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 # Created: 
-# Last Edit: 2017 Jan 08, 02:53:09 PM
+# Last Edit: 2017 May 06, 03:56:16 PM
 # $Id$
 
 =head1 NAME
@@ -21,7 +21,7 @@ use warnings;
 
 =head1 SYNOPSIS
 
-yaml4moodle encode -c news -t people -s kiss -q jigsaw -f 0 > gift_set.txt
+yaml4moodle gift -c news -t people -s kiss -q jigsaw -f 0 > gift_set.txt
 
 =cut
 
