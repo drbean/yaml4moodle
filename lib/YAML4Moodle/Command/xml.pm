@@ -1,4 +1,4 @@
-package YAML4Moodle::Command::gift;
+package YAML4Moodle::Command::xml;
 
 use lib "lib";
 
@@ -8,10 +8,10 @@ use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
 use IO::All;
 
-sub abstract { "Convert drbean's YAML quiz questions to Moodle gift format" }
-sub description { "Convert drbean's YAML quiz questions to Moodle gift format" }
+sub abstract { "Convert drbean's YAML quiz questions to Moodle xml format" }
+sub description { "Convert drbean's YAML quiz questions to Moodle xml format" }
 
-sub usage_desc { "yaml2gift gift -c news -t people -s kiss -q jigsaw -f 0" }
+sub usage_desc { "yaml4moodle xml -c news -t people -s kiss -q jigsaw -f 0" }
 
 sub opt_spec  {
         return (
@@ -37,7 +37,7 @@ sub execute {
 		@story = keys %$yaml;
 	}
 	else { @story = $story; }
-	my $gift = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$quiz' quiz, '$form' form\n\n";
+	my $xml = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$quiz' quiz, '$form' form\n\n";
 	my $Course = ucfirst $course;
 
 	unless ( $quiz ) {
@@ -56,64 +56,64 @@ sub execute {
 			for my $form ( @form ) {
 				my $quiz = $content->{$form}->{quiz};
 
-				$gift .= "// identifier: $content->{$form}->{identifier}\n";
-				$gift .= "\n";
+				$xml .= "// identifier: $content->{$form}->{identifier}\n";
+				$xml .= "\n";
 				my $n = "00";
 				for my $item ( @$quiz ) {
 					++$n;
 					my $question = $item->{question};
 					my $answer = $item->{answer};
 					my $prefix = substr $question, 0, 15;
-					$gift .= ":: $story $form  Qn $n: $prefix :: $question {\n";
+					$xml .= ":: $story $form  Qn $n: $prefix :: $question {\n";
 					if ( defined $item->{option} ) {
 						my $option = $item->{option};
 						for my $alternative ( @$option ) {
 							if ( $answer eq $alternative ) {
-								$gift .= "= $alternative\n";
+								$xml .= "= $alternative\n";
 							}
-							else { $gift .= "~ $alternative\n" }
+							else { $xml .= "~ $alternative\n" }
 						}
 					}
-					else { $gift .= uc $answer . "\n"}
-					$gift .= "}\n\n";
+					else { $xml .= uc $answer . "\n"}
+					$xml .= "}\n\n";
 				}
 			}
 		}
 		elsif ( $quiz eq "match" ) {
 			for my $form ( @form ) {
 				my $identifier = $content->{$form}->{identifier};
-				$gift .= "// identifier: $identifier\n";
-				$gift .= "\n";
+				$xml .= "// identifier: $identifier\n";
+				$xml .= "\n";
 				my $n = "00";
 				my $pairs = $content->{$form}->{pair};
 				my $prefix = substr $pairs->[0]->[1], 0, 15;
-				$gift .= ":: $story $quiz $form  Qn $n: $prefix :: Match. {\n";
+				$xml .= ":: $story $quiz $form  Qn $n: $prefix :: Match. {\n";
 				for my $pair ( @$pairs ) {
 					++$n;
 					my $prompt = $pair->[0];
 					my $answer = $pair->[1];
-					$gift .= "\t=$prompt -> $answer\n";
+					$xml .= "\t=$prompt -> $answer\n";
 				}
-				$gift .= "}\n\n";
+				$xml .= "}\n\n";
 			}
 		}
 		elsif ( $quiz eq "scramble" ) {
 			for my $form ( @form ) {
 				my $sentences = $content->{$form}->{sentence};
-				$gift .= "// identifier: $content->{$form}->{identifier}\n";
-				$gift .= "\n";
+				$xml .= "// identifier: $content->{$form}->{identifier}\n";
+				$xml .= "\n";
 				my $n = "00";
 				for my $sentence ( @$sentences ) {
 					++$n;
 					my $prefix = substr $sentence, 0, 15;
-					$gift .= ":: $story $form  Qn $n: $prefix :: Unscramble. {\n";
+					$xml .= ":: $story $form  Qn $n: $prefix :: Unscramble. {\n";
 					my @word = split '\s', $sentence;
 					my $m = "00";
 					for my $word ( @word ) {
 						++$m;
-						$gift .= "\t=$m -> $word\n"
+						$xml .= "\t=$m -> $word\n"
 					}
-					$gift .= "}\n\n";
+					$xml .= "}\n\n";
 				}
 			}
 		}
@@ -123,8 +123,8 @@ sub execute {
 				my $cloze = $content->{$form}->{clozed};
 				my @word = split /(\s+|\.|,)/, $sentences;
 				my @string = split /\|/, $cloze;
-				$gift .= "// identifier: $content->{$form}->{identifier}\n";
-				$gift .= "\n";
+				$xml .= "// identifier: $content->{$form}->{identifier}\n";
+				$xml .= "\n";
 				my @question;
 				my @answer;
 				my $n = "0";
@@ -143,11 +143,11 @@ sub execute {
 				}
 				my $question = join "", @question;
 				my $answer = join "\t", @answer;
-				$gift .= $question . "\n\n" . $answer;
+				$xml .= $question . "\n\n" . $answer;
 			}
 		}
 	}
-	$gift > io("-");
+	$xml > io("-");
 
 }
 
