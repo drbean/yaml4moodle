@@ -11,7 +11,7 @@ use IO::All;
 sub abstract { "Convert drbean's YAML quiz questions to Moodle gift format" }
 sub description { "Convert drbean's YAML quiz questions to Moodle gift format" }
 
-sub usage_desc { "yaml2gift gift -c news -t people -s kiss -q jigsaw -f 0" }
+sub usage_desc { "yaml4moodle gift -c news -t people -s kiss -q jigsaw -f 0" }
 
 sub opt_spec  {
         return (
