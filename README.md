@@ -8,7 +8,7 @@ Version 0.01
 
 # SYNOPSIS
 
-yaml4moodle encode -c news -t people -s kiss -q jigsaw -f 0 > gift\_set.txt
+yaml4moodle <gift|xml> -c news -t people -s kiss -q jigsaw -f 0 > gift\_set.txt
 
 # DESCRIPTION
 

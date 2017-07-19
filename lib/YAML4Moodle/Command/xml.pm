@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
 use IO::All;
+use XML::DOM;
+
 
 sub abstract { "Convert drbean's YAML quiz questions to Moodle xml format" }
 sub description { "Convert drbean's YAML quiz questions to Moodle xml format" }
@@ -37,7 +39,18 @@ sub execute {
 		@story = keys %$yaml;
 	}
 	else { @story = $story; }
-	my $xml = "// Auto generated for the '$course' course, '$topic' topic, '$story' story, '$quiz' quiz, '$form' form\n\n";
+	my $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+
+	my $q = XML::DOM::Document->createElement("quiz");
+	my $qn = XML::DOM::Document->createElement("question");
+	$qn->setAttribute("type","category");
+	my $cat = XML::DOM::Document->createElement("category");
+	my $text = XML::DOM::Document->createElement("text");
+	$text->addText("\$cat1\$/$topic");
+	$cat->appendChild($text);
+	$qn->appendChild($cat);
+	$q->appendChild($qn);
+
 	my $Course = ucfirst $course;
 
 	unless ( $quiz ) {
@@ -56,66 +69,153 @@ sub execute {
 			for my $form ( @form ) {
 				my $quiz = $content->{$form}->{quiz};
 
-				$xml .= "// identifier: $content->{$form}->{identifier}\n";
-				$xml .= "\n";
 				my $n = "00";
 				for my $item ( @$quiz ) {
 					++$n;
 					my $question = $item->{question};
 					my $answer = $item->{answer};
+					die "Not a jigsaw multiple choice. No question, answer."
+						unless $question && $answer;
 					my $prefix = substr $question, 0, 15;
-					$xml .= ":: $story $form  Qn $n: $prefix :: $question {\n";
+					my $qn = XML::DOM::Document->createElement("question");
+					my $name = XML::DOM::Document->createElement("name");
+					my $text = XML::DOM::Document->createElement("text");
+					$text->addText("$story $form  Qn $n: $prefix");
+					$name->appendChild( $text);
+					$qn->appendChild( $name);
+
+					my $qntext = XML::DOM::Document->createElement("questiontext");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText($question);
+					$qntext->appendChild($text);
+					$qn->appendChild($qntext);
+
 					if ( defined $item->{option} ) {
 						my $option = $item->{option};
+						$qn->setAttribute("type","multichoice");
 						for my $alternative ( @$option ) {
+							my $a = XML::DOM::Document->createElement("answer");
 							if ( $answer eq $alternative ) {
-								$xml .= "= $alternative\n";
+								$a->setAttribute("fraction", "100");
 							}
-							else { $xml .= "~ $alternative\n" }
+							else { $a->setAttribute("fraction", "50");
+							}
+							my $text = XML::DOM::Document->createElement("text");
+							$text->addText($alternative);
+							$a->appendChild($text);
+							$qn->appendChild($a);
 						}
 					}
-					else { $xml .= uc $answer . "\n"}
-					$xml .= "}\n\n";
+					else {
+						$qn->setAttribute("type","truefalsegroup");
+						my $a = XML::DOM::Document->createElement("answer");
+						$a->setAttribute("fraction", "100");
+						$text = XML::DOM::Document->createElement("text");
+						$text->addText($answer);
+						$a->appendChild($text);
+						$qn->appendChild($a);
+					}
+					$q->appendChild($qn);
 				}
+				$xml .= $q->toString;
 			}
 		}
 		elsif ( $quiz eq "match" ) {
 			for my $form ( @form ) {
-				my $identifier = $content->{$form}->{identifier};
-				$xml .= "// identifier: $identifier\n";
-				$xml .= "\n";
-				my $n = "00";
 				my $pairs = $content->{$form}->{pair};
+				die "Not a match. No pair."
+					unless $pairs;
+				my $n = "00";
 				my $prefix = substr $pairs->[0]->[1], 0, 15;
-				$xml .= ":: $story $quiz $form  Qn $n: $prefix :: Match. {\n";
+				$xml .= "";
+				my $qn = XML::DOM::Document->createElement("question");
+				$qn->setAttribute("type","matching");
+				my $name = XML::DOM::Document->createElement("name");
+				my $text = XML::DOM::Document->createElement("text");
+				$text->addText("$story $quiz $form  Qn $n: $prefix :: Match.");
+				$name->appendChild( $text);
+				$qn->appendChild( $name);
+
+				my $qntext = XML::DOM::Document->createElement("questiontext");
+				$text = XML::DOM::Document->createElement("text");
+				$text->addText( "Match: ");
+				$qntext->appendChild($text);
+				$qn->appendChild($qntext);
+
+				$qntext = XML::DOM::Document->createElement("shuffleanswers");
+				$text = XML::DOM::Document->createElement("text");
+				$text->addText( "false");
+				$qntext->appendChild($text);
+				$qn->appendChild($qntext);
+
 				for my $pair ( @$pairs ) {
 					++$n;
 					my $prompt = $pair->[0];
 					my $answer = $pair->[1];
-					$xml .= "\t=$prompt -> $answer\n";
+
+					my $subqn = XML::DOM::Document->createElement("subquestion");
+					my $text = XML::DOM::Document->createElement("text");
+					$text->addText($prompt);
+					$subqn->appendChild($text);
+					my $a = XML::DOM::Document->createElement("answer");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText($answer);
+					$a->appendChild($text);
+					$subqn->appendChild($a);
+					$qn->appendChild($subqn);
 				}
-				$xml .= "}\n\n";
+				$q->appendChild($qn);
 			}
+			$xml .= $q->toString;
 		}
 		elsif ( $quiz eq "scramble" ) {
 			for my $form ( @form ) {
 				my $sentences = $content->{$form}->{sentence};
-				$xml .= "// identifier: $content->{$form}->{identifier}\n";
-				$xml .= "\n";
+				die "Not a scramble. No sentence."
+					unless $sentences;
 				my $n = "00";
 				for my $sentence ( @$sentences ) {
 					++$n;
 					my $prefix = substr $sentence, 0, 15;
-					$xml .= ":: $story $form  Qn $n: $prefix :: Unscramble. {\n";
+					my $qn = XML::DOM::Document->createElement("question");
+					$qn->setAttribute("type","matching");
+					my $name = XML::DOM::Document->createElement("name");
+					my $text = XML::DOM::Document->createElement("text");
+					$text->addText("$story $form  Qn $n: $prefix scramble");
+					$name->appendChild( $text);
+					$qn->appendChild( $name);
+
+					my $qntext = XML::DOM::Document->createElement("questiontext");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText( "Unscramble: ");
+					$qntext->appendChild($text);
+					$qn->appendChild($qntext);
+
+					$qntext = XML::DOM::Document->createElement("shuffleanswers");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText( "false");
+					$qntext->appendChild($text);
+					$qn->appendChild($qntext);
+
 					my @word = split '\s', $sentence;
 					my $m = "00";
 					for my $word ( @word ) {
 						++$m;
-						$xml .= "\t=$m -> $word\n"
+						my $subqn = XML::DOM::Document->createElement("subquestion");
+						my $text = XML::DOM::Document->createElement("text");
+						$text->addText($m);
+						$subqn->appendChild($text);
+						my $a = XML::DOM::Document->createElement("answer");
+						$text = XML::DOM::Document->createElement("text");
+						$text->addText($word);
+						$a->appendChild($text);
+						$subqn->appendChild($a);
+						$qn->appendChild($subqn);
 					}
-					$xml .= "}\n\n";
+					$q->appendChild($qn);
 				}
 			}
+			$xml .= $q->toString;
 		}
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
