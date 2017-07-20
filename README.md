@@ -8,7 +8,7 @@ Version 0.01
 
 # SYNOPSIS
 
-yaml4moodle <gift|xml> -c news -t people -s kiss -q jigsaw -f 0 > gift\_set.txt
+	yaml4moodle <gift|xml> -c news -t people -s kiss -q jigsaw -f 0 > gift\_set.txt
 
 # DESCRIPTION
 
@@ -54,24 +54,24 @@ A: You were arrested for creating a disturbance. The police let you go, and Mari
 B: You create a disturbance by trying to kiss Mario as he is reporting the arrest of Shia for an earlier, different disturbance. You are not arrested.
 C: You are reporting the arrest of Shia. Erykah interrupts you by trying to kiss you. But you are able to avoid her and continue your report.
 
-:: Question 1 :: A {
-~ Erykah
-~ Mario
-= Shia
-}
-
-:: Question 2 :: B {
-= Erykah
-~ Mario
-~ Shia
-}
-
-:: Question 3 :: C {
-~ Erykah
-= Mario
-~ Shia
-}
-
+    :: Question 1 :: A {
+    ~ Erykah
+    ~ Mario
+    = Shia
+    }
+    
+    :: Question 2 :: B {
+    = Erykah
+    ~ Mario
+    ~ Shia
+    }
+    
+    :: Question 3 :: C {
+    ~ Erykah
+    = Mario
+    ~ Shia
+    }
+    
 :: Question 4 :: Shia is troublesome \\& is arrested. {
 TRUE
 }
