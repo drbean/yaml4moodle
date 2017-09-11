@@ -46,7 +46,7 @@ sub execute {
 	$qn->setAttribute("type","category");
 	my $cat = XML::DOM::Document->createElement("category");
 	my $text = XML::DOM::Document->createElement("text");
-	$text->addText("\$cat1\$/$topic");
+	$text->addText("$topic/$story");
 	$cat->appendChild($text);
 	$qn->appendChild($cat);
 	$q->appendChild($qn);
