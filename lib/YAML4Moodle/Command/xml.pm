@@ -92,7 +92,13 @@ sub execute {
 
 					if ( defined $item->{option} ) {
 						my $option = $item->{option};
-						$qn->setAttribute("type","multichoice");
+						if ( $#$option == 0 ) {
+							$qn->setAttribute("type","shortanswer");
+						}
+						elsif ( $#$option > 0 ) {
+							$qn->setAttribute("type","multichoice");
+						}
+						else { die "options malformed."}
 						for my $alternative ( @$option ) {
 							my $a = XML::DOM::Document->createElement("answer");
 							if ( $answer eq $alternative ) {
