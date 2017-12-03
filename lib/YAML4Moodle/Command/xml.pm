@@ -5,7 +5,7 @@ use lib "lib";
 use YAML4Moodle -command;
 use strict;
 use warnings;
-use YAML qw/Dump LoadFile DumpFile/;
+use YAML::XS qw/Dump LoadFile DumpFile/;
 use IO::All;
 use XML::DOM;
 
@@ -113,11 +113,11 @@ sub execute {
 						}
 					}
 					else {
-						$qn->setAttribute("type","truefalsegroup");
+						$qn->setAttribute("type","truefalse");
 						my $a = XML::DOM::Document->createElement("answer");
 						$a->setAttribute("fraction", "100");
 						$text = XML::DOM::Document->createElement("text");
-						$text->addText($answer);
+						$text->addText(lc $answer);
 						$a->appendChild($text);
 						$qn->appendChild($a);
 					}
@@ -204,6 +204,8 @@ sub execute {
 					$qn->appendChild($qntext);
 
 					my @word = split '\s', $sentence;
+					my %dupe;
+					$dupe{$_}++ for @word;
 					my $m = "00";
 					for my $word ( @word ) {
 						++$m;
@@ -213,6 +215,9 @@ sub execute {
 						$subqn->appendChild($text);
 						my $a = XML::DOM::Document->createElement("answer");
 						$text = XML::DOM::Document->createElement("text");
+						if ( $dupe{$word} > 1 ) {
+							$word .= "_$m;"
+						}
 						$text->addText($word);
 						$a->appendChild($text);
 						$subqn->appendChild($a);
@@ -223,15 +228,50 @@ sub execute {
 			}
 			$xml .= $q->toString;
 		}
+use orz;
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
-				my $sentences = $content->{$form}->{sentence};
+				my $sentence = $content->{$form}->{sentence};
 				my $cloze = $content->{$form}->{clozed};
-				my @word = split /(\s+|\.|,)/, $sentences;
+				my @word = split /(\s+|\.|,)/, $sentence;
+				die "no words in $sentence\n" unless @word;
 				my @string = split /\|/, $cloze;
-				$xml .= "// identifier: $content->{$form}->{identifier}\n";
+				die "no clozed words in $cloze\n" unless @string;
+				$xml .= "<!-- identifier: $content->{$form}->{identifier} -->";
 				$xml .= "\n";
-				my @question;
+
+				my $prefix = substr $sentence, 0, 15;
+				my $qn = XML::DOM::Document->createElement("question");
+				$qn->setAttribute("type","ddwtos");
+				my $name = XML::DOM::Document->createElement("name");
+				my $text = XML::DOM::Document->createElement("text");
+				$text->appendData($sentence);
+				$name->appendChild( $text);
+				$qn->appendChild( $name);
+
+				my $qntext = XML::DOM::Document->createElement("questiontext");
+				$text = XML::DOM::Document->createElement("text");
+				my $cdata = XML::DOM::Document->createCDATASection;
+
+				my $m = "00";
+				for my $word ( @word ) {
+					++$m;
+					my $subqn = XML::DOM::Document->createElement("subquestion");
+					my $text = XML::DOM::Document->createElement("text");
+					$text->addText($m);
+					$subqn->appendChild($text);
+					my $a = XML::DOM::Document->createElement("answer");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText($word);
+					$a->appendChild($text);
+					$subqn->appendChild($a);
+					$qn->appendChild($subqn);
+				}
+
+				$q->appendChild($qn);
+				$qntext->appendChild($text);
+				$qn->appendChild($qntext);
+
 				my @answer;
 				my $n = "0";
 				my $match;
@@ -252,6 +292,7 @@ sub execute {
 				$xml .= $question . "\n\n" . $answer;
 			}
 		}
+no orz;
 	}
 	$xml > io("-");
 
