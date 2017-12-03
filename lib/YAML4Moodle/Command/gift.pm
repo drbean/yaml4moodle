@@ -117,35 +117,6 @@ sub execute {
 				}
 			}
 		}
-		elsif ( $quiz eq "drag" ) {
-			for my $form ( @form ) {
-				my $sentences = $content->{$form}->{sentence};
-				my $cloze = $content->{$form}->{clozed};
-				my @word = split /(\s+|\.|,)/, $sentences;
-				my @string = split /\|/, $cloze;
-				$gift .= "// identifier: $content->{$form}->{identifier}\n";
-				$gift .= "\n";
-				my @question;
-				my @answer;
-				my $n = "0";
-				my $match;
-				$match = shift @string;
-				for my $word ( @word ) {
-					if ( $match eq $word ) {
-						$n++;
-						push @question, "[[$n]]";
-						$match = shift @string;
-						push @answer, $word;
-					}
-					else {
-						push @question, $word;
-					} 
-				}
-				my $question = join "", @question;
-				my $answer = join "\t", @answer;
-				$gift .= $question . "\n\n" . $answer;
-			}
-		}
 	}
 	$gift > io("-");
 
