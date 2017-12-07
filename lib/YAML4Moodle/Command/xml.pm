@@ -228,7 +228,6 @@ sub execute {
 			}
 			$xml .= $q->toString;
 		}
-use orz;
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
 				my $sentence = $content->{$form}->{sentence};
@@ -237,62 +236,64 @@ use orz;
 				die "no words in $sentence\n" unless @word;
 				my @string = split /\|/, $cloze;
 				die "no clozed words in $cloze\n" unless @string;
-				$xml .= "<!-- identifier: $content->{$form}->{identifier} -->";
-				$xml .= "\n";
+
+				my $comment = XML::DOM::Document->createComment
+					("identifier: $content->{$form}->{identifier}");
+				$q->appendChild( $comment );
 
 				my $prefix = substr $sentence, 0, 15;
 				my $qn = XML::DOM::Document->createElement("question");
 				$qn->setAttribute("type","ddwtos");
 				my $name = XML::DOM::Document->createElement("name");
 				my $text = XML::DOM::Document->createElement("text");
-				$text->appendData($sentence);
+				$text->addText("$story $form: $prefix drag");
 				$name->appendChild( $text);
 				$qn->appendChild( $name);
 
 				my $qntext = XML::DOM::Document->createElement("questiontext");
 				$text = XML::DOM::Document->createElement("text");
-				my $cdata = XML::DOM::Document->createCDATASection;
 
+				my $cdata_text;
 				my $m = "00";
+				my $n = "0";
+				my @clozed;
+				my %dupe;
+				$dupe{$_}++ for @word;
 				for my $word ( @word ) {
 					++$m;
-					my $subqn = XML::DOM::Document->createElement("subquestion");
-					my $text = XML::DOM::Document->createElement("text");
-					$text->addText($m);
-					$subqn->appendChild($text);
-					my $a = XML::DOM::Document->createElement("answer");
-					$text = XML::DOM::Document->createElement("text");
-					$text->addText($word);
-					$a->appendChild($text);
-					$subqn->appendChild($a);
-					$qn->appendChild($subqn);
-				}
-
-				$q->appendChild($qn);
-				$qntext->appendChild($text);
-				$qn->appendChild($qntext);
-
-				my @answer;
-				my $n = "0";
-				my $match;
-				$match = shift @string;
-				for my $word ( @word ) {
-					if ( $match eq $word ) {
+					if ( $string[0] eq $word ) {
 						$n++;
-						push @question, "[[$n]]";
-						$match = shift @string;
-						push @answer, $word;
+						$cloze = shift @string;
+						if ( $dupe{$word} > 1 ) {
+							$cloze .= "_$n";
+						}
+						$cdata_text .= "[[$n]]";
+						my $dragbox = XML::DOM::Document->createElement("dragbox");
+						my $text = XML::DOM::Document->createElement("text");
+						$text->addText( $cloze );
+						$dragbox->appendChild( $text );
+						push @clozed, $dragbox;
 					}
-					else {
-						push @question, $word;
-					} 
+					else { $cdata_text .= $word; }
 				}
-				my $question = join "", @question;
-				my $answer = join "\t", @answer;
-				$xml .= $question . "\n\n" . $answer;
+				$XML::DOM::Parser::KeepCDATA = 1;
+				my $cdata = XML::DOM::Document->createCDATASection( $cdata_text );
+				$text->appendChild( $cdata );
+				$qntext->appendChild( $text );
+				$qn->appendChild( $qntext );
+
+				my $shuffle = XML::DOM::Document->createElement("shuffleanswers");
+				$shuffle->addText("1");
+				$qn->appendChild($shuffle);
+
+				for my $dragbox ( @clozed ) {
+					$qn->appendChild( $dragbox );
+				}
+				$q->appendChild($qn);
+
 			}
+			$xml .= $q->toString;
 		}
-no orz;
 	}
 	$xml > io("-");
 
