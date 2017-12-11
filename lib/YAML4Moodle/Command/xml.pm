@@ -230,73 +230,85 @@ sub execute {
 		}
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
-				my $sentence = $content->{$form}->{sentence};
-				my $cloze = $content->{$form}->{clozed};
-				my @word = split /(\s+|\.|,)/, $sentence;
-				die "no words in $sentence\n" unless @word;
-				my @string = split /\|/, $cloze;
-				die "no clozed words in $cloze\n" unless @string;
+				my $sentences;
+				if ( $content->{$form}->{sentences} ) {
+					$sentences = $content->{$form}->{sentences};
+				}
+				else { die "Not a drag. No sentences." }
+				my $n = "00";
+				for my $sentence ( @$sentences ) {
+					my $words = $sentence->{sentence};
+					my $cloze = $sentence->{clozed};
+					my @word = split /(\s+|\.|,)/, $words;
+					die "no words in $words\n" unless @word;
+					my @string = split /\|/, $cloze;
+					die "no clozed words in $cloze\n" unless @string;
 
-				my $comment = XML::DOM::Document->createComment
-					("identifier: $content->{$form}->{identifier}");
-				$q->appendChild( $comment );
+					my $comment = XML::DOM::Document->createComment
+						("identifier: $content->{$form}->{identifier}");
+					$q->appendChild( $comment );
 
-				my $prefix = substr $sentence, 0, 15;
-				my $qn = XML::DOM::Document->createElement("question");
-				$qn->setAttribute("type","ddwtos");
-				my $name = XML::DOM::Document->createElement("name");
-				my $text = XML::DOM::Document->createElement("text");
-				$text->addText("$story $form: $prefix drag");
-				$name->appendChild( $text);
-				$qn->appendChild( $name);
+					my $prefix = substr $words, 0, 15;
+					my $qn = XML::DOM::Document->createElement("question");
+					$qn->setAttribute("type","ddwtos");
+					my $name = XML::DOM::Document->createElement("name");
+					my $text = XML::DOM::Document->createElement("text");
+					$text->addText("$story $form: $prefix drag");
+					$name->appendChild( $text);
+					$qn->appendChild( $name);
 
-				my $qntext = XML::DOM::Document->createElement("questiontext");
-				$text = XML::DOM::Document->createElement("text");
+					my $qntext = XML::DOM::Document->createElement("questiontext");
+					$text = XML::DOM::Document->createElement("text");
 
-				my $cdata_text;
-				my $m = "00";
-				my $n = "0";
-				my @clozed;
-				my %dupe;
-				$dupe{$_}++ for @word;
-				for my $word ( @word ) {
-					++$m;
-					if ( $string[0] eq $word ) {
-						$n++;
-						$cloze = shift @string;
-						if ( $dupe{$word} > 1 ) {
-							$cloze .= "_$n";
+					my $cdata_text;
+					my $m = "00";
+					my $n = "0";
+					my @clozed;
+					my %dupe;
+					$dupe{$_}++ for @word;
+					for my $word ( @word ) {
+						++$m;
+						if ( $string[0] eq $word ) {
+							$n++;
+							$cloze = shift @string;
+							if ( $dupe{$word} > 1 ) {
+								$cloze .= "_$n";
+							}
+							$cdata_text .= "[[$n]]";
+							my $dragbox = XML::DOM::Document->createElement("dragbox");
+							my $text = XML::DOM::Document->createElement("text");
+							$text->addText( $cloze );
+							$dragbox->appendChild( $text );
+							push @clozed, $dragbox;
 						}
-						$cdata_text .= "[[$n]]";
-						my $dragbox = XML::DOM::Document->createElement("dragbox");
-						my $text = XML::DOM::Document->createElement("text");
-						$text->addText( $cloze );
-						$dragbox->appendChild( $text );
-						push @clozed, $dragbox;
+						else { $cdata_text .= $word; }
 					}
-					else { $cdata_text .= $word; }
+					$XML::DOM::Parser::KeepCDATA = 1;
+					my $cdata = XML::DOM::Document->createCDATASection( $cdata_text );
+					$text->appendChild( $cdata );
+					$qntext->appendChild( $text );
+					$qn->appendChild( $qntext );
+
+					my $grade = XML::DOM::Document->createElement("defaultgrade");
+					$grade->addText("3");
+					$qn->appendChild($grade);
+
+					my $shuffle = XML::DOM::Document->createElement("shuffleanswers");
+					$shuffle->addText("1");
+					$qn->appendChild($shuffle);
+
+					for my $dragbox ( @clozed ) {
+						$qn->appendChild( $dragbox );
+					}
+					$q->appendChild($qn);
+
 				}
-				$XML::DOM::Parser::KeepCDATA = 1;
-				my $cdata = XML::DOM::Document->createCDATASection( $cdata_text );
-				$text->appendChild( $cdata );
-				$qntext->appendChild( $text );
-				$qn->appendChild( $qntext );
-
-				my $shuffle = XML::DOM::Document->createElement("shuffleanswers");
-				$shuffle->addText("1");
-				$qn->appendChild($shuffle);
-
-				for my $dragbox ( @clozed ) {
-					$qn->appendChild( $dragbox );
-				}
-				$q->appendChild($qn);
-
+				$xml .= $q->toString;
 			}
-			$xml .= $q->toString;
 		}
-	}
-	$xml > io("-");
+		$xml > io("-");
 
+	}
 }
 
 1;
