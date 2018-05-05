@@ -189,33 +189,6 @@ sub execute {
 					}
 					else {
 						$qn->setAttribute("type","truefalse");
-						my $correct_feedback = XML::DOM::Document->createElement("correctfeedback");
-						$correct_feedback->setAttribute("format","moodle_auto_format");
-						my $correct_feedtext = XML::DOM::Document->createElement("text");
-						my $cdata = XML::DOM::Document->createCDATASection( "Good try!" );
-						$correct_feedtext->appendChild( $cdata );
-						$correct_feedtext->addText( " " );
-						$correct_feedback->appendChild($correct_feedtext);
-						$qn->appendChild($correct_feedback);
-
-						my $partiallycorrect_feedback = XML::DOM::Document->createElement("partiallycorrectfeedback");
-						$partiallycorrect_feedback->setAttribute("format","moodle_auto_format");
-						my $partiallycorrect_feedtext = XML::DOM::Document->createElement("text");
-						my $pc_cdata = XML::DOM::Document->createCDATASection( "Try again!" );
-						$partiallycorrect_feedtext->appendChild( $pc_cdata );
-						$partiallycorrect_feedtext->addText( " " );
-						$partiallycorrect_feedback->appendChild($partiallycorrect_feedtext);
-						$qn->appendChild($partiallycorrect_feedback);
-
-						my $incorrect_feedback = XML::DOM::Document->createElement("incorrectfeedback");
-						$incorrect_feedback->setAttribute("format","moodle_auto_format");
-						my $incorrect_feedtext = XML::DOM::Document->createElement("text");
-						my $ic_cdata = XML::DOM::Document->createCDATASection( "Try again!" );
-						$incorrect_feedtext->appendChild( $ic_cdata );
-						$incorrect_feedtext->addText( " " );
-						$incorrect_feedback->appendChild($incorrect_feedtext);
-						$qn->appendChild($incorrect_feedback);
-
 						my $a = XML::DOM::Document->createElement("answer");
 						$a->setAttribute("fraction", "100");
 						$text = XML::DOM::Document->createElement("text");
@@ -224,8 +197,8 @@ sub execute {
 						my $feedback = XML::DOM::Document->createElement("feedback");
 						$feedback->setAttribute("format","html");
 						my $feedtext = XML::DOM::Document->createElement("text");
-						my $answer_cdata = XML::DOM::Document->createCDATASection( "Try again!" );
-						$feedtext->appendChild( $answer_cdata );
+						my $cdata = XML::DOM::Document->createCDATASection( "Try again!" );
+						$feedtext->appendChild( $cdata );
 						$feedtext->addText( " " );
 						$feedback->appendChild($feedtext);
 						$a->appendChild($feedback);
