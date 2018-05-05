@@ -41,12 +41,13 @@ sub execute {
 	else { @story = $story; }
 	my $xml = '<?xml version="1.0" encoding="UTF-8"?>';
 
+	$XML::DOM::Parser::KeepCDATA = 1;
 	my $q = XML::DOM::Document->createElement("quiz");
 	my $qn = XML::DOM::Document->createElement("question");
 	$qn->setAttribute("type","category");
 	my $cat = XML::DOM::Document->createElement("category");
 	my $text = XML::DOM::Document->createElement("text");
-	$text->addText("$topic/$story");
+	$text->addText("\$cat1\$/top/$topic/$story");
 	$cat->appendChild($text);
 	$qn->appendChild($cat);
 	$q->appendChild($qn);
@@ -85,10 +86,12 @@ sub execute {
 					$qn->appendChild( $name);
 
 					my $qntext = XML::DOM::Document->createElement("questiontext");
+					$qntext->setAttribute("format","html");
 					$text = XML::DOM::Document->createElement("text");
-					$text->addText($question);
-					$qntext->appendChild($text);
-					$qn->appendChild($qntext);
+					my $cdata = XML::DOM::Document->createCDATASection( $question );
+					$text->appendChild( $cdata );
+					$qntext->appendChild( $text );
+					$qn->appendChild( $qntext );
 
 					if ( defined $item->{option} ) {
 						my $option = $item->{option};
@@ -101,6 +104,7 @@ sub execute {
 						else { die "options malformed."}
 						for my $alternative ( @$option ) {
 							my $a = XML::DOM::Document->createElement("answer");
+							die "no option?" unless $alternative;
 							if ( $answer eq $alternative ) {
 								$a->setAttribute("fraction", "100");
 							}
@@ -112,6 +116,77 @@ sub execute {
 							$qn->appendChild($a);
 						}
 					}
+					elsif ( ref $item->{answer} eq "ARRAY" ){
+						$qn->setAttribute("type","regexp");
+						my $generalfeedback = XML::DOM::Document->createElement("generalfeedback");
+						$generalfeedback->setAttribute("format","html");
+						$text = XML::DOM::Document->createElement("text");
+						$generalfeedback->appendChild( $text );
+						$qn->appendChild( $generalfeedback );
+						my $defaultgrade = XML::DOM::Document->createElement("defaultgrade");
+						$defaultgrade->addText("1");
+						$qn->appendChild( $defaultgrade );
+						my $penalty = XML::DOM::Document->createElement("penalty");
+						$penalty->addText("0.1");
+						$qn->appendChild( $penalty );
+						my $usehint = XML::DOM::Document->createElement("usehint");
+						$usehint->addText("0");
+						$qn->appendChild( $usehint );
+						my $usecase = XML::DOM::Document->createElement("usecase");
+						$usecase->addText("0");
+						$qn->appendChild( $usecase );
+						my $studentshowalternate = XML::DOM::Document->createElement("studentshowalternate");
+						$studentshowalternate->addText("0");
+						$qn->appendChild( $studentshowalternate );
+
+						my $matches = $item->{answer};
+						for my $answer ( @$matches ) {
+							my $a = XML::DOM::Document->createElement("answer");
+							$a->setAttribute("fraction", "100");
+							my $text = XML::DOM::Document->createElement("text");
+							$text->addText($answer);
+							$a->appendChild($text);
+							my $feedback = XML::DOM::Document->createElement("feedback");
+							$feedback->setAttribute("format","html");
+							my $feedtext = XML::DOM::Document->createElement("text");
+							$feedback->appendChild($feedtext);
+							$a->appendChild($feedback);
+							$qn->appendChild($a);
+						}
+						if ( $item->{incorrect} ) {
+							my $matches = $item->{incorrect};
+							for my $answer ( @$matches ) {
+								my $a = XML::DOM::Document->createElement("answer");
+								$a->setAttribute("fraction", "0");
+								my $text = XML::DOM::Document->createElement("text");
+								$text->addText($answer->{error});
+								$a->appendChild($text);
+								my $feedback = XML::DOM::Document->createElement("feedback");
+								$feedback->setAttribute("format","html");
+								my $feedtext = XML::DOM::Document->createElement("text");
+								my $cdata = XML::DOM::Document->createCDATASection( $answer->{feedback} );
+								$feedtext->appendChild( $cdata );
+								$feedback->appendChild($feedtext);
+								$a->appendChild($feedback);
+								$qn->appendChild($a);
+							}
+						}
+						my $a = XML::DOM::Document->createElement("answer");
+						$a->setAttribute("fraction", "0");
+						my $text = XML::DOM::Document->createElement("text");
+						$text->addText( '^.*$' );
+						$a->appendChild($text);
+						my $feedback = XML::DOM::Document->createElement("feedback");
+						$feedback->setAttribute("format","html");
+						my $feedtext = XML::DOM::Document->createElement("text");
+						my $cdata = XML::DOM::Document->createCDATASection( "Try again!" );
+						$feedtext->appendChild( $cdata );
+						$feedtext->addText( " " );
+						$feedback->appendChild($feedtext);
+						$a->appendChild($feedback);
+						$qn->appendChild($a);
+
+					}
 					else {
 						$qn->setAttribute("type","truefalse");
 						my $a = XML::DOM::Document->createElement("answer");
@@ -119,6 +194,14 @@ sub execute {
 						$text = XML::DOM::Document->createElement("text");
 						$text->addText(lc $answer);
 						$a->appendChild($text);
+						my $feedback = XML::DOM::Document->createElement("feedback");
+						$feedback->setAttribute("format","html");
+						my $feedtext = XML::DOM::Document->createElement("text");
+						my $cdata = XML::DOM::Document->createCDATASection( "Try again!" );
+						$feedtext->appendChild( $cdata );
+						$feedtext->addText( " " );
+						$feedback->appendChild($feedtext);
+						$a->appendChild($feedback);
 						$qn->appendChild($a);
 					}
 					$q->appendChild($qn);
