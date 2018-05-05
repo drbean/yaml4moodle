@@ -189,6 +189,7 @@ sub execute {
 					}
 					else {
 						$qn->setAttribute("type","truefalse");
+                                                my %opposite = ( True => "false", False => "true" );
 						my $a = XML::DOM::Document->createElement("answer");
 						$a->setAttribute("fraction", "100");
 						$text = XML::DOM::Document->createElement("text");
@@ -197,12 +198,26 @@ sub execute {
 						my $feedback = XML::DOM::Document->createElement("feedback");
 						$feedback->setAttribute("format","html");
 						my $feedtext = XML::DOM::Document->createElement("text");
-						my $cdata = XML::DOM::Document->createCDATASection( "Try again!" );
+						my $cdata = XML::DOM::Document->createCDATASection( "Correct!" );
 						$feedtext->appendChild( $cdata );
 						$feedtext->addText( " " );
 						$feedback->appendChild($feedtext);
 						$a->appendChild($feedback);
 						$qn->appendChild($a);
+						my $alternative = XML::DOM::Document->createElement("answer");
+						$alternative->setAttribute("fraction", "0");
+						$text = XML::DOM::Document->createElement("text");
+						$text->addText( $opposite{$answer} );
+						$alternative->appendChild($text);
+						my $alt_feedback = XML::DOM::Document->createElement("feedback");
+						$feedback->setAttribute("format","html");
+						my $alt_feedtext = XML::DOM::Document->createElement("text");
+						my $alt_cdata = XML::DOM::Document->createCDATASection( "Try again!" );
+						$alt_feedtext->appendChild( $alt_cdata );
+						$alt_feedtext->addText( " " );
+						$alt_feedback->appendChild($alt_feedtext);
+						$alternative->appendChild($alt_feedback);
+						$qn->appendChild($alternative);
 					}
 					$q->appendChild($qn);
 				}
