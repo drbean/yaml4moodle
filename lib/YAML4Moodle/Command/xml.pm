@@ -5,7 +5,7 @@ use lib "lib";
 use YAML4Moodle -command;
 use strict;
 use warnings;
-use YAML::XS qw/Dump LoadFile DumpFile/;
+use YAML qw/Dump LoadFile DumpFile/;
 use IO::All;
 use XML::DOM;
 
@@ -326,6 +326,81 @@ sub execute {
 			}
 			$xml .= $q->toString;
 		}
+		elsif ( $quiz eq "description" ) {
+			for my $form ( @form ) {
+				my $description;
+				if ( $content->{$form}->{questiontext} ) {
+					$description = $content->{$form}->{questiontext};
+				}
+				else { die "Not a description. No questiontext." }
+                                my $comment = XML::DOM::Document->createComment
+                                        ("identifier: $content->{$form}->{identifier}");
+                                $q->appendChild( $comment );
+
+                                my $prefix = substr $description, 0, 15;
+                                my $qn = XML::DOM::Document->createElement("question");
+                                $qn->setAttribute("type","description");
+                                my $name = XML::DOM::Document->createElement("name");
+                                my $text = XML::DOM::Document->createElement("text");
+                                $text->addText("$story $form: $prefix description");
+                                $name->appendChild( $text);
+                                $qn->appendChild( $name);
+
+                                my $qntext = XML::DOM::Document->createElement("questiontext");
+                                $text = XML::DOM::Document->createElement("text");
+                                my $cdata_text = $description;
+                                $XML::DOM::Parser::KeepCDATA = 1;
+                                my $cdata = XML::DOM::Document->createCDATASection( $cdata_text );
+                                $text->appendChild( $cdata );
+                                $qntext->appendChild( $text );
+                                $qn->appendChild( $qntext );
+                                $q->appendChild($qn);
+
+                        }
+                        $xml .= $q->toString;
+                }
+		elsif ( $quiz eq "essay" ) {
+			for my $form ( @form ) {
+				my $rubric;
+				if ( $content->{$form}->{rubric} ) {
+					$rubric = $content->{$form}->{rubric};
+				}
+				else { die "Not an essay. No rubric text!!" }
+                                my $comment = XML::DOM::Document->createComment
+                                        ("identifier: $content->{$form}->{identifier}");
+                                $q->appendChild( $comment );
+
+                                my $prefix = substr $rubric, 0, 15;
+                                my $qn = XML::DOM::Document->createElement("question");
+                                $qn->setAttribute("type", "$quiz");
+                                my $name = XML::DOM::Document->createElement("name");
+                                my $text = XML::DOM::Document->createElement("text");
+                                $text->addText("$story $form: $prefix $quiz");
+                                $name->appendChild( $text);
+                                $qn->appendChild( $name);
+
+                                my $qntext = XML::DOM::Document->createElement("questiontext");
+				$qntext->setAttribute("format","markdown");
+                                $text = XML::DOM::Document->createElement("text");
+                                my $cdata_text = $rubric;
+                                $XML::DOM::Parser::KeepCDATA = 1;
+                                my $cdata = XML::DOM::Document->createCDATASection( $cdata_text );
+                                $text->appendChild( $cdata );
+                                $qntext->appendChild( $text );
+                                $qn->appendChild( $qntext );
+                                $q->appendChild($qn);
+
+				my $grade = XML::DOM::Document->createElement("defaultgrade");
+				$grade->addText(9);
+				$qn->appendChild($grade);
+
+				my $penalty = XML::DOM::Document->createElement("penalty");
+				$penalty->addText(0);
+				$qn->appendChild($penalty);
+
+                        }
+                        $xml .= $q->toString;
+                }
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
 				my $sentences;
