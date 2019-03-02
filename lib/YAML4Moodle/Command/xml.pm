@@ -69,6 +69,7 @@ sub execute {
 		if ( $quiz eq "jigsaw" ) {
 			for my $form ( @form ) {
 				my $quiz = $content->{$form}->{quiz};
+				my $identifier = $content->{$form}->{identifier};
 
 				my $n = "00";
 				for my $item ( @$quiz ) {
@@ -84,6 +85,13 @@ sub execute {
 					$text->addText("$story $form  Qn $n: $prefix");
 					$name->appendChild( $text);
 					$qn->appendChild( $name);
+					my $tags = XML::DOM::Document->createElement("tags");
+					my $tag = XML::DOM::Document->createElement("tag");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText($identifier);
+					$tag->appendChild( $text );
+					$tags->appendChild( $tag );
+					$qn->appendChild( $tags );
 
 					my $qntext = XML::DOM::Document->createElement("questiontext");
 					$qntext->setAttribute("format","html");
@@ -403,6 +411,7 @@ sub execute {
                 }
 		elsif ( $quiz eq "drag" ) {
 			for my $form ( @form ) {
+				my $identifier = $content->{$form}->{identifier};
 				my $sentences;
 				if ( $content->{$form}->{sentences} ) {
 					$sentences = $content->{$form}->{sentences};
@@ -429,6 +438,13 @@ sub execute {
 					$text->addText("$story $form: $prefix drag");
 					$name->appendChild( $text);
 					$qn->appendChild( $name);
+					my $tags = XML::DOM::Document->createElement("tags");
+					my $tag = XML::DOM::Document->createElement("tag");
+					$text = XML::DOM::Document->createElement("text");
+					$text->addText($identifier);
+					$tag->appendChild( $text );
+					$tags->appendChild( $tag );
+					$qn->appendChild( $tags );
 
 					my $qntext = XML::DOM::Document->createElement("questiontext");
 					$text = XML::DOM::Document->createElement("text");
