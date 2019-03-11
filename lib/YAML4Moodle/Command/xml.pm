@@ -454,19 +454,18 @@ sub execute {
 					my $n = "0";
 					my @clozed;
 					my %dupe;
-					$dupe{$_}++ for @word;
+					$dupe{$_}++ for @string;
 					for my $word ( @word ) {
 						++$m;
 						if ( $string[0] eq $word ) {
 							$n++;
-							$cloze = shift @string;
-							if ( $dupe{$word} > 1 ) {
-								$cloze .= "_$n";
-							}
+							my $candidate = shift @string;
+                                                        die "'$candidate' is duplicate in '$cloze' for '$words'\n"
+                                                                if $dupe{$word} > 1; 
 							$cdata_text .= "[[$n]]";
 							my $dragbox = XML::DOM::Document->createElement("dragbox");
 							my $text = XML::DOM::Document->createElement("text");
-							$text->addText( $cloze );
+							$text->addText( $candidate );
 							$dragbox->appendChild( $text );
 							push @clozed, $dragbox;
 						}
