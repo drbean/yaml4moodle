@@ -453,15 +453,20 @@ sub execute {
 					my $m = "00";
 					my $n = "0";
 					my @clozed;
-					my %dupe;
+					my (%dupe, %rename);
 					$dupe{$_}++ for @string;
+					for my $cloze ( @string ) {
+						$rename{$cloze} = 0 if $dupe{$cloze} > 1;
+					}
 					for my $word ( @word ) {
 						++$m;
 						if ( $string[0] eq $word ) {
 							$n++;
 							my $candidate = shift @string;
-                                                        die "'$candidate' is duplicate in '$cloze' for '$words'\n"
-                                                                if $dupe{$word} > 1; 
+							if ( exists $rename{$candidate} ) {
+									$rename{$candidate}++;
+									$candidate .= "_$rename{$candidate}";
+								}
 							$cdata_text .= "[[$n]]";
 							my $dragbox = XML::DOM::Document->createElement("dragbox");
 							my $text = XML::DOM::Document->createElement("text");
