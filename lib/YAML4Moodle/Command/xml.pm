@@ -355,6 +355,7 @@ sub execute {
                                 $qn->appendChild( $name);
 
                                 my $qntext = XML::DOM::Document->createElement("questiontext");
+				$qntext->setAttribute("format","markdown");
                                 $text = XML::DOM::Document->createElement("text");
                                 my $cdata_text = $description;
                                 $XML::DOM::Parser::KeepCDATA = 1;
