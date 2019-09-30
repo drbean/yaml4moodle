@@ -94,7 +94,7 @@ sub execute {
 					$qn->appendChild( $tags );
 
 					my $qntext = XML::DOM::Document->createElement("questiontext");
-					$qntext->setAttribute("format","html");
+					$qntext->setAttribute("format","markdown");
 					$text = XML::DOM::Document->createElement("text");
 					my $cdata = XML::DOM::Document->createCDATASection( $question );
 					$text->appendChild( $cdata );
