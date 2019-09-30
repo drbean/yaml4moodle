@@ -400,7 +400,7 @@ sub execute {
                                 $q->appendChild($qn);
 
 				my $grade = XML::DOM::Document->createElement("defaultgrade");
-				$grade->addText(9);
+				$grade->addText(5);
 				$qn->appendChild($grade);
 
 				my $penalty = XML::DOM::Document->createElement("penalty");
