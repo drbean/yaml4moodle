@@ -1,4 +1,4 @@
-package YAML4Moodle::Command::description;
+package YAML4Moodle::Command::intro;
 
 use lib "lib";
 
@@ -16,7 +16,8 @@ sub usage_desc { 'yaml4moodle intro -t read -s vacation -f 0' }
 
 sub opt_spec  {
         return (
-                ["t=s", "topic"]
+                ["c=s", "course"]
+                , ["t=s", "topic"]
                 , ["s=s", "story"]
                 , ["f=s", "form"]
 	);
@@ -26,12 +27,13 @@ sub opt_spec  {
 sub execute {
 	my ($self, $opt, $args) = @_;
 
-	my ($topic, $story, $form) = @$opt{qw/t s f/};
+	my ($course, $topic, $story, $form) = @$opt{qw/c t s f/};
+	die "description course '$course'?" unless $course;
 	die "description topic '$topic'?" unless $topic;
 	die "description story '$story'?" unless $story;
 	die "description form '$form'?" unless defined $form;
 
-	my $y = LoadFile "$topic/cards.yaml";
+	my $y = LoadFile "/home/drbean/curriculum/$course/$topic/cards.yaml";
 	my $io = io "$topic/intro.txt";
 	$io->print( $y->{$story}->{essay}->{$form}->{rubric}  );
 	$io->autoflush;
