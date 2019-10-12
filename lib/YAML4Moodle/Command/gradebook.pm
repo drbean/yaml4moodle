@@ -1,4 +1,4 @@
-package YAML4Moodle::Command::intro;
+package YAML4Moodle::Command::gradebook;
 
 use lib "lib";
 
@@ -7,19 +7,20 @@ use strict;
 use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
 use IO::All;
+use Cwd;
+use File::Basename;
 
 
-sub abstract { "Create file for Moodle intro text from cards.yaml" }
-sub description { "Frequent use transfering intro text from essay rubric in cards.yaml" }
+sub abstract { "import-ready csv file from beancan-name yaml file" }
+sub description { "munges in-class evaluated yaml beancan-name file to moodle-ready cvs gradebook file" }
 
-sub usage_desc { 'yaml4moodle intro -t read -s vacation -f 0' }
+sub usage_desc { 'yaml4moodle gradebook -l BMA0034 -t "Saying something about letters" -w 3' }
 
 sub opt_spec  {
         return (
-                ["c=s", "course"]
+                ["l=s", "league"]
                 , ["t=s", "topic"]
-                , ["s=s", "story"]
-                , ["f=s", "form"]
+                , ["w=s", "week"]
 	);
 }
 
@@ -27,15 +28,26 @@ sub opt_spec  {
 sub execute {
 	my ($self, $opt, $args) = @_;
 
-	my ($course, $topic, $story, $form) = @$opt{qw/c t s f/};
-	die "description course '$course'?" unless $course;
+	my ($directory, $topic, $week) = @$opt{qw/l t w/};
+	$directory = $directory? $directory : my $dir = basename( getcwd );
 	die "description topic '$topic'?" unless $topic;
-	die "description story '$story'?" unless $story;
-	die "description form '$form'?" unless defined $form;
+	die "description form '$week'?" unless defined $week;
 
-	my $y = LoadFile "/home/drbean/curriculum/$course/$topic/cards.yaml";
-	my $io = io "$topic/intro.txt";
-	$io->print( $y->{$story}->{essay}->{$form}->{rubric}  );
+	use Grades;
+
+	my $league = League->new( leagues => "/home/drbean/$ENV{SEMESTER}", id => $directory );
+	my $members = $league->members;
+	my %member_list = map { $_->{name} => $_ } @$members;
+
+	my $beancan_hash = LoadFile "classwork/$week.yaml";
+	my %score;
+	@score{ keys %$_ } = values %$_ for values %$beancan_hash;
+	my %grade;
+	$grade{$member_list{$_}->{id} } = $score{$_} for keys %score;
+
+	my $io = io "classwork/$week.csv";
+	$io->print( '"ID number","Quiz: ' . $topic . '"' . "\n" );
+	$io->append( "$_,$grade{$_}\n") for keys %grade;
 	$io->autoflush;
 }
 
