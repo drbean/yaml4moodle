@@ -29,23 +29,28 @@ sub execute {
 	my ($self, $opt, $args) = @_;
 
 	my ($directory, $topic, $week) = @$opt{qw/l t w/};
-	$directory = $directory? $directory : my $dir = basename( getcwd );
+	$directory = $directory? $directory : basename( getcwd );
 	die "description topic '$topic'?" unless $topic;
 	die "description form '$week'?" unless defined $week;
 
+	my $semester = $ENV{SEMESTER};
+
 	use Grades;
 
-	my $league = League->new( leagues => "/home/drbean/$ENV{SEMESTER}", id => $directory );
+	my $league = League->new( leagues => "/home/drbean/$semester", id => $directory );
 	my $members = $league->members;
-	my %member_list = map { $_->{name} => $_ } @$members;
+	my %name_list = map { $_->{name} => $_ } @$members;
 
-	my $beancan_hash = LoadFile "classwork/$week.yaml";
+	my $beancan_hash = LoadFile "/home/drbean/$semester/$directory/classwork/$week.yaml";
 	my %score;
 	@score{ keys %$_ } = values %$_ for values %$beancan_hash;
+	## case of $week.yaml is not beancan-keyed, but player id-keyed
+	# @score{ keys %$beancan_hash } = values %$beancan_hash;
 	my %grade;
-	$grade{$member_list{$_}->{id} } = $score{$_} for keys %score;
+	$grade{$name_list{$_}->{id} } = $score{$_} for keys %score;
 
 	my $io = io "classwork/$week.csv";
+	# if manual, perhaps 'Quiz:' not prepended
 	$io->print( '"ID number","Quiz: ' . $topic . '"' . "\n" );
 	$io->append( "$_,$grade{$_}\n") for keys %grade;
 	$io->autoflush;
