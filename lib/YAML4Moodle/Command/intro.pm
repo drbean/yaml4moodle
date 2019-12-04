@@ -33,9 +33,12 @@ sub execute {
 	die "description story '$story'?" unless $story;
 	die "description form '$form'?" unless defined $form;
 
-	my $y = LoadFile "/home/drbean/curriculum/$course/$topic/cards.yaml";
-	my $io = io "$topic/intro.txt";
-	$io->print( $y->{$story}->{essay}->{$form}->{rubric}  );
+	my $y = LoadFile "/home/drbean/curriculum/$course/$topic/cards.yaml" or
+		die "No cards.yaml in '$topic' dir in '$course'\n";
+	my $io = io "-";
+	my $intro = $y->{$story}->{essay}->{$form}->{rubric} or
+		die "No essay rubric for '$story' story, '$form' form\n";
+	$io->print( $intro );
 	$io->autoflush;
 }
 
