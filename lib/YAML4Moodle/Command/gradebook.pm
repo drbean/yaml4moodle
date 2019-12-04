@@ -12,7 +12,7 @@ use File::Basename;
 
 
 sub abstract { "import-ready csv file from beancan-name yaml file" }
-sub description { "munges in-class evaluated yaml beancan-name file to moodle-ready cvs gradebook file" }
+sub description { "munges in-class evaluated yaml beancan-name file to moodle-ready cvs gradebook file. Do not use if not name-keyed. For manually-created gradeitem, 'Quiz: ' may not be prepended." }
 
 sub usage_desc { 'yaml4moodle gradebook -l BMA0034 -t "Saying something about letters" -w 3' }
 
