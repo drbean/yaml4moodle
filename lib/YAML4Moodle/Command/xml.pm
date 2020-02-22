@@ -88,7 +88,7 @@ sub execute {
 					my $tags = XML::DOM::Document->createElement("tags");
 					my $tag = XML::DOM::Document->createElement("tag");
 					$text = XML::DOM::Document->createElement("text");
-					$text->addText($identifier);
+					$text->addText( "${topic}_${story}_${quiz}_$form" );
 					$tag->appendChild( $text );
 					$tags->appendChild( $tag );
 					$qn->appendChild( $tags );
@@ -442,7 +442,7 @@ sub execute {
 					my $tags = XML::DOM::Document->createElement("tags");
 					my $tag = XML::DOM::Document->createElement("tag");
 					$text = XML::DOM::Document->createElement("text");
-					$text->addText($identifier);
+					$text->addText( "${topic}_${story}_${quiz}_$form" );
 					$tag->appendChild( $text );
 					$tags->appendChild( $tag );
 					$qn->appendChild( $tags );
