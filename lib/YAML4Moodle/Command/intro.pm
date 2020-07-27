@@ -19,6 +19,7 @@ sub opt_spec  {
                 ["c=s", "course"]
                 , ["t=s", "topic"]
                 , ["s=s", "story"]
+                , ["a=s", "activity_type"]
                 , ["f=s", "form"]
 	);
 }
@@ -27,17 +28,18 @@ sub opt_spec  {
 sub execute {
 	my ($self, $opt, $args) = @_;
 
-	my ($course, $topic, $story, $form) = @$opt{qw/c t s f/};
-	die "description course '$course'?" unless $course;
-	die "description topic '$topic'?" unless $topic;
-	die "description story '$story'?" unless $story;
-	die "description form '$form'?" unless defined $form;
+	my ($course, $topic, $story, $type, $form) = @$opt{qw/c t s a f/};
+	die "course '$course'?" unless $course;
+	die "topic '$topic'?" unless $topic;
+	die "story '$story'?" unless $story;
+	die "activity type '$type'?" unless $type;
+	die "form '$form'?" unless defined $form;
 
 	my $y = LoadFile "/home/drbean/curriculum/$course/$topic/cards.yaml" or
 		die "No cards.yaml in '$topic' dir in '$course'\n";
 	my $io = io "-";
-	my $intro = $y->{$story}->{essay}->{$form}->{rubric} or
-		die "No essay rubric for '$story' story, '$form' form\n";
+	my $intro = $y->{$story}->{$type}->{$form}->{rubric} or
+		die "No '$type' rubric for '$story' story, '$form' form\n";
 	$io->print( $intro );
 	$io->autoflush;
 }
