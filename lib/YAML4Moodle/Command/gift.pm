@@ -29,7 +29,7 @@ sub execute {
 
 	my ($course, $topic, $story, $quiz, $form) = @$opt{qw/c t s q f/};
 
-	my $yaml = LoadFile "/home/drbean/curriculum/$opt->{c}/$opt->{t}/cards.yaml";
+	my $yaml = LoadFile "/home/$ENV{USER}/curriculum/$opt->{c}/$opt->{t}/cards.yaml";
 
 	my @story;
 	if ( $story eq 'all' ) {
