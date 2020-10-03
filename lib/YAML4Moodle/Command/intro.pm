@@ -35,7 +35,7 @@ sub execute {
 	die "activity type '$type'?" unless $type;
 	die "form '$form'?" unless defined $form;
 
-	my $y = LoadFile "/home/drbean/curriculum/$course/$topic/cards.yaml" or
+	my $y = LoadFile "/home/$ENV{USER}/curriculum/$course/$topic/cards.yaml" or
 		die "No cards.yaml in '$topic' dir in '$course'\n";
 	my $io = io "-";
 	my $intro = $y->{$story}->{$type}->{$form}->{rubric} or

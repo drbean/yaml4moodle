@@ -37,11 +37,11 @@ sub execute {
 
 	use Grades;
 
-	my $league = League->new( leagues => "/home/drbean/$semester", id => $directory );
+	my $league = League->new( leagues => "/home/$ENV{USER}/$semester", id => $directory );
 	my $members = $league->members;
 	my %name_list = map { $_->{name} => $_ } @$members;
 
-	my $beancan_hash = LoadFile "/home/drbean/$semester/$directory/classwork/$week.yaml";
+	my $beancan_hash = LoadFile "/home/$ENV{USER}/$semester/$directory/classwork/$week.yaml";
 	my %score;
 	@score{ keys %$_ } = values %$_ for values %$beancan_hash;
 	## case of $week.yaml is not beancan-keyed, but player id-keyed
