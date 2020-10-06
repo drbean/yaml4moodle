@@ -2,11 +2,11 @@ package YAML4Moodle::Command::gift;
 
 use lib "lib";
 
-use YAML4Moodle -command;
+# use YAML4Moodle -command;
 use strict;
 use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
-use IO::All;
+# use IO::All;
 
 sub abstract { "Convert drbean's YAML quiz questions to Moodle gift format" }
 sub description { "Convert drbean's YAML quiz questions to Moodle gift format" }

@@ -2,11 +2,11 @@ package YAML4Moodle::Command::xml;
 
 use lib "lib";
 
-use YAML4Moodle -command;
+# use YAML4Moodle -command;
 use strict;
 use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
-use IO::All;
+# use IO::All;
 use XML::DOM;
 
 
