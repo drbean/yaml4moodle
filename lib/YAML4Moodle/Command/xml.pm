@@ -500,7 +500,8 @@ sub execute {
 				$xml .= $q->toString;
 			}
 		}
-		$xml > io("-");
+		# $xml > io("-");
+		return $xml;
 
 	}
 }

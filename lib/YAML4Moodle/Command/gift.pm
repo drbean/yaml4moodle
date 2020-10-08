@@ -118,7 +118,8 @@ sub execute {
 			}
 		}
 	}
-	$gift > io("-");
+	# $gift > io("-");
+	return $gift;
 
 }
 
