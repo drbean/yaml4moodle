@@ -2,11 +2,11 @@ package YAML4Moodle::Command::description;
 
 use lib "lib";
 
-use YAML4Moodle -command;
+# use YAML4Moodle -command;
 use strict;
 use warnings;
 use YAML qw/Dump LoadFile DumpFile/;
-use IO::All;
+# use IO::All;
 use XML::DOM;
 
 
@@ -75,7 +75,8 @@ sub execute {
 
 	$xml .= $q->toString;
 
-	$xml > io("-");
+	# $xml > io("-");
+	return $xml;
 }
 
 1;
