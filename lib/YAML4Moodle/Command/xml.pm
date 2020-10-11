@@ -340,7 +340,10 @@ sub execute {
 				if ( $content->{$form}->{questiontext} ) {
 					$description = $content->{$form}->{questiontext};
 				}
-				else { die "Not a description. No questiontext." }
+				elsif ( $content->{$form}->{rubric} ) {
+					$description = $content->{$form}->{rubric};
+				}
+				else { die "Not a description. No questiontext, or rubric." }
                                 my $comment = XML::DOM::Document->createComment
                                         ("identifier: $content->{$form}->{identifier}");
                                 $q->appendChild( $comment );
